@@ -13,15 +13,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.bookstore.R
-import com.example.bookstore.common.CustomDialog
 import com.example.bookstore.common.saveImageToInternalStorage
 import com.example.bookstore.data.dao.BookDao
 import com.example.bookstore.data.model.Book
@@ -136,15 +133,24 @@ fun AddBookScreen(navController: NavHostController, bookDao: BookDao, currentUse
 
             Button(
                     onClick = {
+                        val year = publishedYear.toIntOrNull()
+                        if (year == null) {
+                            dialogTitle = "Error"
+                            dialogMessage = "Invalid published year"
+                            showDialog = true
+                            return@Button
+                        }
+
                         val newBook = Book(
                                 title = title,
                                 author = author,
                                 description = description,
-                                publishedYear = publishedYear.toIntOrNull(),
+                                publishedYear = year,
                                 dateOfRegister = Date(),
                                 bookOwnerId = currentUser.id,
                                 imageUri = bookImage
                         )
+
                         if (!newBook.isTitleValid()) {
                             dialogTitle = "Error"
                             dialogMessage = "Title is required"
@@ -153,6 +159,10 @@ fun AddBookScreen(navController: NavHostController, bookDao: BookDao, currentUse
                         } else if (!newBook.isAuthorValid()) {
                             dialogTitle = "Error"
                             dialogMessage = "Author is required"
+                            showDialog = true
+                        } else if (!newBook.isPublishedYearValid()) {
+                            dialogTitle = "Error"
+                            dialogMessage = "Published year must be after 1950"
                             showDialog = true
                         } else {
                             coroutineScope.launch {
@@ -191,4 +201,3 @@ fun AddBookScreen(navController: NavHostController, bookDao: BookDao, currentUse
         }
     }
 }
-
