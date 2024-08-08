@@ -24,7 +24,7 @@ data class Book(
     }
 
     fun isPublishedYearValid(): Boolean {
-        return publishedYear != null && publishedYear > 1950
+        return publishedYear != null && publishedYear > 1950 && publishedYear <= 2024
     }
 
     fun isDescriptionValid(): Boolean {
