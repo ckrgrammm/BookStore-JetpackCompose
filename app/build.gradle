@@ -59,11 +59,6 @@ android {
 }
 
 dependencies {
-    implementation libs.androidx.ui.test.junit4.android
-    implementation libs.androidx.navigation.testing
-    testImplementation libs.junit.junit
-    def room_version = "2.6.1"
-
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
     implementation "androidx.compose.ui:ui:1.2.0"
@@ -73,37 +68,34 @@ dependencies {
     implementation "androidx.activity:activity-compose:1.5.1"
     implementation "androidx.compose.material:material:1.4.3"
     implementation "androidx.compose.material3:material3:1.1.0-alpha06"
-
-    implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-ktx:$room_version"
-
+    implementation "androidx.room:room-runtime:2.6.1"
+    implementation libs.androidx.ui.test.junit4.android
+    implementation libs.androidx.navigation.testing
+    kapt "androidx.room:room-compiler:2.6.1"
+    implementation "androidx.room:room-ktx:2.6.1"
     implementation "io.coil-kt:coil-compose:2.7.0"
     implementation "com.google.accompanist:accompanist-swiperefresh:0.24.4-alpha"
     implementation "androidx.compose.foundation:foundation:1.2.0"
-    implementation "androidx.compose.foundation:foundation:1.2.0-alpha02"
-
     implementation "com.google.dagger:hilt-android:2.48"
     kapt "com.google.dagger:hilt-compiler:2.48"
-    implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
+
+    androidTestImplementation "androidx.test:runner:1.4.0"
+    androidTestImplementation "androidx.test:rules:1.4.0"
+    androidTestImplementation "androidx.test.ext:junit:1.1.3"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.4.0"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:2.48"
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:2.48"
 
     testImplementation "com.google.dagger:hilt-android-testing:2.48"
     kaptTest "com.google.dagger:hilt-compiler:2.48"
-
-    def mockitoVersion = "3.12.4"
-    def mockitoKotlinVersion = "4.0.0"
-    def mockkVersion = "1.12.0"
-
-    // Optional -- Mockito framework
-    testImplementation "org.mockito:mockito-core:$mockitoVersion"
-    // Optional -- mockito-kotlin
-    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
-    // Optional -- Mockk framework
-    testImplementation "io.mockk:mockk:$mockkVersion"
+    testImplementation "org.mockito:mockito-core:3.12.4"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
+    testImplementation "io.mockk:mockk:1.12.0"
     testImplementation 'org.robolectric:robolectric:4.7.3'
     testImplementation "androidx.test:core:1.4.0"
     testImplementation "androidx.test.ext:junit:1.1.3"
     testImplementation "androidx.test.espresso:espresso-core:3.4.0"
     testImplementation 'org.mockito:mockito-inline:2.13.0'
+    implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
 
 }

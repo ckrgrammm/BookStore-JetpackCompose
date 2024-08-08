@@ -69,15 +69,12 @@ class AddBookScreenKtTest {
             verify(bookDao, times(1)).insertBook(expectedBook)
         }
 
-        // Check if the success dialog is displayed
         composeTestRule.onNodeWithText("Success").assertIsDisplayed()
         composeTestRule.onNodeWithText("Book added successfully!").assertIsDisplayed()
 
-        // Close the dialog and navigate back
         composeTestRule.onNodeWithText("OK").performClick()
         composeTestRule.waitForIdle()
 
-        // Verify navigation to the home screen
         assert(navController.currentBackStackEntry?.destination?.route == "home")
     }
 
@@ -93,13 +90,10 @@ class AddBookScreenKtTest {
         composeTestRule.onNodeWithText("Description of this book").performTextInput("This is a test description.")
         composeTestRule.onNodeWithText("Published Year of this book").performTextInput("2022")
 
-        // Click the Add Book button
         composeTestRule.onNodeWithText("Add Book").performClick()
 
-        // Debugging: Log the UI hierarchy
         composeTestRule.onRoot().printToLog("TAG")
 
-        // Check if the error dialog is displayed
         composeTestRule.onNodeWithText("Error").assertExists()
         composeTestRule.onNodeWithText("Title is required").assertExists()
     }

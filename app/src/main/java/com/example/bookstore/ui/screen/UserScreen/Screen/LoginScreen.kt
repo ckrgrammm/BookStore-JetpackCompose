@@ -109,7 +109,9 @@ fun LoginScreen(
                                 onClick = {
                                     coroutineScope.launch {
                                         loginViewModel.login(userName, password)
-                                        if (!isLoginSuccessful) {
+                                        if (isLoginSuccessful) {
+                                            showDialog = false
+                                        } else {
                                             dialogTitle = "Error"
                                             dialogMessage = errorMessage ?: "Invalid Credentials, Try again!"
                                             showDialog = true

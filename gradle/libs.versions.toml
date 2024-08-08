@@ -12,6 +12,7 @@ navigationCompose = "2.7.7"
 junitJunit = "4.12"
 uiTestJunit4Android = "1.6.8"
 navigationTesting = "2.7.7"
+uiTestJunit4Desktop = "1.6.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +33,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
 androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
+androidx-ui-test-junit4-desktop = { group = "androidx.compose.ui", name = "ui-test-junit4-desktop", version.ref = "uiTestJunit4Desktop" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

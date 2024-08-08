@@ -1,27 +1,28 @@
 package com.example.bookstore.ui.screen.UserScreen.Screen
 
-import org.junit.Test
-
-import org.junit.Assert.*
-import org.mockito.kotlin.whenever
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.*
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
-import com.example.bookstore.HiltTestApplication
 import com.example.bookstore.ui.theme.BookStoreTheme
 import com.example.bookstore.ui.screen.UserScreen.ViewModel.RegisterViewModel
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
+@HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
-@Config(application = HiltTestApplication::class)
 class RegisterScreenKtTest {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -31,6 +32,8 @@ class RegisterScreenKtTest {
 
     @Before
     fun setUp() {
+        hiltRule.inject()
+
         navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         registerViewModel = mock(RegisterViewModel::class.java)
     }
@@ -48,10 +51,8 @@ class RegisterScreenKtTest {
         composeTestRule.onNodeWithText("Re-enter Password").performTextInput("password321")
         composeTestRule.onNodeWithText("Register").performClick()
 
-        // Debugging: Log the UI hierarchy
         composeTestRule.onRoot().printToLog("TAG")
 
-        // Check if the error dialog is displayed
         composeTestRule.onNodeWithText("Error").assertExists()
         composeTestRule.onNodeWithText("Passwords do not match.").assertExists()
     }
@@ -68,10 +69,8 @@ class RegisterScreenKtTest {
         composeTestRule.onNodeWithText("Re-enter Password").performTextInput("password123")
         composeTestRule.onNodeWithText("Register").performClick()
 
-        // Debugging: Log the UI hierarchy
         composeTestRule.onRoot().printToLog("TAG")
 
-        // Check if the error dialog is displayed
         composeTestRule.onNodeWithText("Error").assertExists()
         composeTestRule.onNodeWithText("Please fill up all the required fields.").assertExists()
     }
@@ -92,10 +91,8 @@ class RegisterScreenKtTest {
             composeTestRule.onNodeWithText("Re-enter Password").performTextInput("password123")
             composeTestRule.onNodeWithText("Register").performClick()
 
-            // Debugging: Log the UI hierarchy
             composeTestRule.onRoot().printToLog("TAG")
 
-            // Check if the error dialog is displayed
             composeTestRule.onNodeWithText("Error").assertExists()
             composeTestRule.onNodeWithText("Username is already taken.").assertExists()
         }
@@ -117,10 +114,8 @@ class RegisterScreenKtTest {
             composeTestRule.onNodeWithText("Re-enter Password").performTextInput("password123")
             composeTestRule.onNodeWithText("Register").performClick()
 
-            // Debugging: Log the UI hierarchy
             composeTestRule.onRoot().printToLog("TAG")
 
-            // Check if the success dialog is displayed
             composeTestRule.onNodeWithText("Success").assertExists()
             composeTestRule.onNodeWithText("Register Successfully!").assertExists()
         }
@@ -132,5 +127,3 @@ class RegisterScreenKtTest {
         }
     }
 }
-
-//annotation class
