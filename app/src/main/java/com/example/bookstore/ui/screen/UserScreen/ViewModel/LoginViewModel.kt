@@ -3,9 +3,11 @@ package com.example.bookstore.ui.screen.UserScreen.ViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.example.bookstore.data.dao.UserDao
 import com.example.bookstore.data.model.User
@@ -26,7 +28,9 @@ class LoginViewModel @Inject constructor(
     fun login(userName: String, password: String) {
         viewModelScope.launch {
             try {
-                val user = userDao.getUser(userName, password)
+                val user = withContext(Dispatchers.IO) {
+                    userDao.getUser(userName, password)
+                }
                 if (user != null) {
                     currentUser = user
                     _isLoginSuccessful.value = true
@@ -39,5 +43,9 @@ class LoginViewModel @Inject constructor(
                 _errorMessage.value = e.message
             }
         }
+    }
+
+    fun clearErrorMessage() {
+        _errorMessage.value = null
     }
 }
