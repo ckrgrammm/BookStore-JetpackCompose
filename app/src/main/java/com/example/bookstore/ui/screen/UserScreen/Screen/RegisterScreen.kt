@@ -127,7 +127,11 @@ fun RegisterScreen(navController: NavHostController) {
                                         dialogTitle = "Error"
                                         dialogMessage = "Please fill up all the required fields."
                                         showDialog = true
-                                    } else if (registerViewModel.isUsernameTaken(userName)) {
+                                    } else if(!user.isUsernameValid()){
+                                        dialogTitle = "Error"
+                                        dialogMessage = "Username should in between 4 - 10."
+                                        showDialog = true
+                                    }  else if (registerViewModel.isUsernameTaken(userName)) {
                                         dialogTitle = "Error"
                                         dialogMessage = "Username is already taken."
                                         showDialog = true

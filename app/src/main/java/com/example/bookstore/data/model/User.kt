@@ -18,6 +18,11 @@ data class User(
         val userProfile: String? = R.drawable.ic_default_profile.toString(),
 )
 {
+    fun isUsernameValid(): Boolean
+    {
+        return userName.length in 4..10
+    }
+
     fun isPasswordValid(): Boolean
     {
         return password == rePassword
