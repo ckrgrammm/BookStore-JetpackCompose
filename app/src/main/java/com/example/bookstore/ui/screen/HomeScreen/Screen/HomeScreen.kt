@@ -1,6 +1,7 @@
 package com.example.bookstore.ui.screen.HomeScreen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,8 +45,9 @@ fun HomeScreen(navController: NavHostController, bookDao: BookDao, currentUser: 
     Scaffold(
             topBar = {
                 TopAppBar(
-                        title = { Text("SS Book Store") },
-                        backgroundColor = MaterialTheme.colors.primary
+                        title = { Text("SS Book Store", style = MaterialTheme.typography.h6) },
+                        backgroundColor = MaterialTheme.colors.primary,
+                        contentColor = Color.White
                 )
             }
     ) {
@@ -53,10 +55,11 @@ fun HomeScreen(navController: NavHostController, bookDao: BookDao, currentUser: 
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
-                    .background(Color.White)
+                    .background(MaterialTheme.colors.background)
         ) {
             LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
             ) {
                 items(books, key = { it.id }) { book ->
                     val dismissState = rememberDismissState(
@@ -103,20 +106,6 @@ fun HomeScreen(navController: NavHostController, bookDao: BookDao, currentUser: 
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                    onClick = {
-                        UserSession.logout()
-                        navController.navigate("login") {
-                            popUpTo("home") { inclusive = true }
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-            ) {
-                Text("Logout", fontSize = 18.sp)
-            }
         }
     }
 }
@@ -149,7 +138,7 @@ fun BookItem(
                         onClick = { navController.navigate("bookDetail/${book.id}") },
                         onLongClick = { showMenu = true }
                 ),
-            elevation = 2.dp
+            elevation = 4.dp
     ) {
         Row(
                 modifier = Modifier
@@ -167,9 +156,9 @@ fun BookItem(
             Column(
                     modifier = Modifier.weight(1f)
             ) {
-                Text(text = book.title, style = MaterialTheme.typography.h6)
+                Text(text = book.title, style = MaterialTheme.typography.subtitle1)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = book.author, style = MaterialTheme.typography.body2)
+                Text(text = book.author, style = MaterialTheme.typography.body2, color = Color.Gray)
             }
 
             if (showMenu && book.bookOwnerId == currentUser.id) {
