@@ -1,4 +1,4 @@
-package com.example.bookstore.ui.navigation
+package com.example.bookstore.common.nav
 
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem

@@ -12,7 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.bookstore.common.UserSession
-import com.example.bookstore.ui.navigation.BottomNavigationBar
+import com.example.bookstore.common.nav.BottomNavigationBar
 import com.example.bookstore.ui.screen.BookScreen.Screen.AddBookScreen
 import com.example.bookstore.ui.screen.BookScreen.Screen.BookDetailScreen
 import com.example.bookstore.ui.screen.BookScreen.Screen.EditBookScreen
@@ -37,6 +37,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
             Log.d("MainActivity", "Current User ${UserSession.getCurrentUser()}")

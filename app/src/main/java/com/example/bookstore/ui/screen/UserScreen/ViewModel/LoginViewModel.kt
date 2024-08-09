@@ -29,14 +29,20 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val user = withContext(Dispatchers.IO) {
-                    userDao.getUser(userName, password)
+                    userDao.getUserByUsername(userName)
                 }
+
                 if (user != null) {
-                    currentUser = user
-                    _isLoginSuccessful.value = true
+                    if (user.password == password) {
+                        currentUser = user
+                        _isLoginSuccessful.value = true
+                    } else {
+                        _isLoginSuccessful.value = false
+                        _errorMessage.value = "Invalid password"
+                    }
                 } else {
                     _isLoginSuccessful.value = false
-                    _errorMessage.value = "Invalid username or password"
+                    _errorMessage.value = "No account found with this username"
                 }
             } catch (e: Exception) {
                 _isLoginSuccessful.value = false
@@ -44,6 +50,8 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+
 
     fun clearErrorMessage() {
         _errorMessage.value = null
