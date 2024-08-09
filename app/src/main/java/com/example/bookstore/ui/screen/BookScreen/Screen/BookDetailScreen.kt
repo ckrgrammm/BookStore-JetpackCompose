@@ -28,9 +28,17 @@ import java.util.*
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun BookDetailScreen(navController: NavHostController, bookId: Int, bookDao: BookDao) {
+fun BookDetailScreen(
+        navController: NavHostController,
+        bookDao: BookDao,
+        bookId: Int
+) {
     val coroutineScope = rememberCoroutineScope()
     var book by remember { mutableStateOf<Book?>(null) }
+
+    var dialogTitle by remember { mutableStateOf("") }
+    var dialogMessage by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(bookId) {
         coroutineScope.launch {
@@ -38,142 +46,122 @@ fun BookDetailScreen(navController: NavHostController, bookId: Int, bookDao: Boo
         }
     }
 
-    book?.let { book ->
-        val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()) }
-        val dateString = book.dateOfRegister?.let { dateFormat.format(it) } ?: "Unknown date"
-        val painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current)
-                    .data(book.imageUri)
-                    .build()
-        )
-
-        Scaffold(
-                topBar = {
-                    TopAppBar(
-                            title = { Text(book.title) },
-                            backgroundColor = MaterialTheme.colors.primary,
-                            contentColor = Color.White
-                    )
-                }
-        ) {
-            Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                        .background(MaterialTheme.colors.background)
-                        .verticalScroll(rememberScrollState())
-
-            ) {
-                Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 80.dp)
-                            .navigationBarsPadding(),
-                        verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            elevation = 8.dp,
-                            shape = RoundedCornerShape(16.dp),
-                            backgroundColor = MaterialTheme.colors.surface
-                    ) {
-                        Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                        ) {
-                            Image(
-                                    painter = painter,
-                                    contentDescription = "Book Image",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(250.dp)
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(Color.Gray)
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            Text(
-                                    text = book.title,
-                                    style = MaterialTheme.typography.h4.copy(fontSize = 26.sp),
-                                    color = Color.Black,
-                                    modifier = Modifier.padding(bottom = 8.dp)
-                            )
-                            Text(
-                                    text = "By: ${book.author}",
-                                    style = MaterialTheme.typography.subtitle1,
-                                    color = Color.Gray,
-                                    modifier = Modifier.padding(bottom = 8.dp)
-                            )
-                            book.publishedYear?.let { year ->
-                                Text(
-                                        text = "Published Year: $year",
-                                        style = MaterialTheme.typography.subtitle1,
-                                        color = Color.Gray,
-                                        modifier = Modifier.padding(bottom = 8.dp)
-                                )
-                            }
-                            Text(
-                                    text = "Registered on: $dateString",
-                                    style = MaterialTheme.typography.body2.copy(color = Color.Gray),
-                                    modifier = Modifier.padding(bottom = 8.dp)
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            book.description?.let { desc ->
-                                Text(
-                                        text = desc,
-                                        style = MaterialTheme.typography.body1.copy(lineHeight = 22.sp),
-                                        modifier = Modifier.padding(bottom = 8.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-
-                GradientButton(
-                        text = "Back",
-                        onClick = { navController.navigateUp() },
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(horizontal = 16.dp)
-                            .navigationBarsPadding()
+    Scaffold(
+            scaffoldState = rememberScaffoldState(),
+            topBar = {
+                TopAppBar(
+                        title = { Text("Book Details") },
+                        backgroundColor = MaterialTheme.colors.primary
                 )
             }
+    ) {
+        book?.let {
+            BookDetailContent(
+                    book = it,
+                    onBackClick = { navController.navigateUp() },
+                    onEditClick = { navController.navigate("edit_book_screen/${it.id}") }
+            )
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text(dialogTitle) },
+                    text = { Text(dialogMessage) },
+                    confirmButton = {
+                        Button(
+                                onClick = { showDialog = false }
+                        ) {
+                            Text("OK")
+                        }
+                    }
+            )
         }
     }
 }
 
 @Composable
-fun GradientButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Button(
-            onClick = onClick,
-            modifier = modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.primary
-            ),
-            shape = RoundedCornerShape(50)
+fun BookDetailContent(
+        book: Book,
+        onBackClick: () -> Unit,
+        onEditClick: () -> Unit
+) {
+    val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
+    val dateString = book.dateOfRegister?.let { dateFormat.format(it) } ?: "Unknown date"
+
+    Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
     ) {
-        Box(
+        Image(
+                painter = rememberAsyncImagePainter(book.imageUri),
+                contentDescription = "Book Image",
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                            brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
-                                    colors = listOf(
-                                            MaterialTheme.colors.primary,
-                                            MaterialTheme.colors.secondary
-                                    )
-                            ),
-                            shape = RoundedCornerShape(50)
-                    ),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .height(250.dp)
+                    .padding(bottom = 16.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colors.surface)
+        )
+
+        Text(
+                text = book.title,
+                style = MaterialTheme.typography.h4,
+                modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Text(
+                text = "Author: ${book.author}",
+                style = MaterialTheme.typography.subtitle1,
+                modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        book.publishedYear?.let {
+            Text(
+                    text = "Published Year: $it",
+                    style = MaterialTheme.typography.subtitle1,
+                    modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+
+        Text(
+                text = "Registered on: $dateString",
+                style = MaterialTheme.typography.body2,
+                color = Color.Gray,
+                modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        book.description?.let {
+            Text(
+                    text = it,
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Button(
+                onClick = onEditClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(bottom = 8.dp)
         ) {
-            Text(text, fontSize = 18.sp, color = Color.White)
+            Text("Edit Book")
+        }
+
+        Button(
+                onClick = onBackClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+        ) {
+            Text("Back")
         }
     }
 }
+
+

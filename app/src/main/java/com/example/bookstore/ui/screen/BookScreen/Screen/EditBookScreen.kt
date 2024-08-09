@@ -30,135 +30,92 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun EditBookScreen(navController: NavHostController, bookDao: BookDao, bookId: Int) {
+fun EditBookScreen(
+        navController: NavHostController,
+        bookDao: BookDao,
+        bookId: Int
+) {
     val coroutineScope = rememberCoroutineScope()
     var book by remember { mutableStateOf<Book?>(null) }
+
+    var title by remember { mutableStateOf("") }
+    var author by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var publishedYear by remember { mutableStateOf("") }
+    var bookImage by remember { mutableStateOf<String?>(null) }
 
     var dialogTitle by remember { mutableStateOf("") }
     var dialogMessage by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+
     LaunchedEffect(bookId) {
         coroutineScope.launch {
-            book = bookDao.getBookById(bookId)
+            val loadedBook = bookDao.getBookById(bookId)
+            book = loadedBook
+            loadedBook?.let {
+                title = it.title
+                author = it.author
+                description = it.description ?: ""
+                publishedYear = it.publishedYear?.toString() ?: ""
+                bookImage = it.imageUri
+            }
         }
     }
 
-    book?.let { currentBook ->
-        var title by remember { mutableStateOf(currentBook.title) }
-        var author by remember { mutableStateOf(currentBook.author) }
-        var description by remember { mutableStateOf(currentBook.description ?: "") }
-        var publishedYear by remember { mutableStateOf(currentBook.publishedYear?.toString() ?: "") }
-        var bookImage by remember { mutableStateOf(currentBook.imageUri ?: "") }
-
-        val scaffoldState = rememberScaffoldState()
-        val context = LocalContext.current
-
-        val imagePickerLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.GetContent()
-        ) { uri: Uri? ->
-            uri?.let {
-                val savedPath = saveImageToInternalStorage(context, it)
-                if (savedPath != null) {
-                    bookImage = savedPath
-                } else {
-                    coroutineScope.launch {
-                        dialogTitle = "Error"
-                        dialogMessage = "Failed to save image"
-                        showDialog = true
-                    }
-                }
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            val savedPath = saveImageToInternalStorage(context, it)
+            if (savedPath != null) {
+                bookImage = savedPath
+            } else {
+                dialogTitle = "Error"
+                dialogMessage = "Failed to save image"
+                showDialog = true
             }
         }
+    }
 
-        Scaffold(
-                scaffoldState = scaffoldState,
-                topBar = {
-                    TopAppBar(
-                            title = { Text("Edit Book") },
-                            backgroundColor = MaterialTheme.colors.primary
-                    )
-                }
-        ) {
-            Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    bookImage?.let {
-                        Image(
-                                painter = rememberAsyncImagePainter(it),
-                                contentDescription = "Book Image",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .padding(bottom = 16.dp)
-                                    .clickable { imagePickerLauncher.launch("image/*") }
-                                    .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(16.dp))
-                        )
-                    } ?: Image(
-                            painter = painterResource(id = R.drawable.ic_book),
-                            contentDescription = "Book Image",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .padding(bottom = 16.dp)
-                                .clickable { imagePickerLauncher.launch("image/*") }
-                                .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(16.dp))
-                    )
+    Scaffold(
+            scaffoldState = rememberScaffoldState(),
+            topBar = {
+                TopAppBar(
+                        title = { Text("Edit Book") },
+                        backgroundColor = MaterialTheme.colors.primary
+                )
+            }
+    ) {
+        book?.let {
+            EditBookContent(
+                    title = title,
+                    onTitleChange = { title = it },
+                    author = author,
+                    onAuthorChange = { author = it },
+                    description = description,
+                    onDescriptionChange = { description = it },
+                    publishedYear = publishedYear,
+                    onPublishedYearChange = { publishedYear = it },
+                    bookImage = bookImage,
+                    onImageClick = { imagePickerLauncher.launch("image/*") },
+                    onSaveClick = {
+                        val year = publishedYear.toIntOrNull()
+                        if (year == null) {
+                            dialogTitle = "Error"
+                            dialogMessage = "Invalid published year"
+                            showDialog = true
+                        } else {
+                            val updatedBook = it.copy(
+                                    title = title,
+                                    author = author,
+                                    description = description,
+                                    publishedYear = year,
+                                    imageUri = bookImage
+                            )
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    OutlinedTextField(
-                            value = title,
-                            onValueChange = { title = it },
-                            label = { Text("Title") },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(8.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                            value = author,
-                            onValueChange = { author = it },
-                            label = { Text("Author") },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(8.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                            value = description,
-                            onValueChange = { description = it },
-                            label = { Text("Description of this book") },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(8.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                            value = publishedYear,
-                            onValueChange = { publishedYear = it },
-                            label = { Text("Published Year of this book") },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(8.dp)
-                    )
-                }
-
-                Button(
-                        onClick = {
                             coroutineScope.launch {
-                                val updatedBook = currentBook.copy(
-                                        title = title,
-                                        author = author,
-                                        description = description,
-                                        publishedYear = publishedYear.toIntOrNull(),
-                                        imageUri = bookImage,
-                                        dateOfRegister = currentBook.dateOfRegister,
-                                        bookOwnerId = currentBook.bookOwnerId
-                                )
                                 if (!updatedBook.isTitleValid()) {
                                     dialogTitle = "Error"
                                     dialogMessage = "Title is required"
@@ -169,7 +126,7 @@ fun EditBookScreen(navController: NavHostController, bookDao: BookDao, bookId: I
                                     showDialog = true
                                 } else if (!updatedBook.isPublishedYearValid()) {
                                     dialogTitle = "Error"
-                                    dialogMessage = "Valid Published Year is required"
+                                    dialogMessage = "Published year must be after 1950"
                                     showDialog = true
                                 } else {
                                     bookDao.updateBook(updatedBook)
@@ -178,30 +135,117 @@ fun EditBookScreen(navController: NavHostController, bookDao: BookDao, bookId: I
                                     showDialog = true
                                 }
                             }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
-                ) {
-                    Text("Update", fontSize = 18.sp, color = Color.White)
-                }
-            }
-
-            if (showDialog) {
-                CustomDialog(
-                        title = dialogTitle,
-                        message = dialogMessage,
-                        onDismiss = { showDialog = false },
-                        onConfirm = {
-                            showDialog = false
-                            if (dialogTitle == "Success") {
-                                navController.popBackStack()
-                            }
                         }
-                )
-            }
+                    }
+            )
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text(dialogTitle) },
+                    text = { Text(dialogMessage) },
+                    confirmButton = {
+                        Button(
+                                onClick = {
+                                    showDialog = false
+                                    if (dialogTitle == "Success") {
+                                        navController.navigate("home")
+                                    }
+                                }
+                        ) {
+                            Text("OK")
+                        }
+                    }
+            )
         }
     }
 }
+
+@Composable
+fun EditBookContent(
+        title: String,
+        onTitleChange: (String) -> Unit,
+        author: String = "",
+        onAuthorChange: (String) -> Unit,
+        description: String = "",
+        onDescriptionChange: (String) -> Unit,
+        publishedYear: String = "",
+        onPublishedYearChange: (String) -> Unit,
+        bookImage: String?,
+        onImageClick: () -> Unit,
+        onSaveClick: () -> Unit
+) {
+    Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+    ) {
+        bookImage?.let {
+            Image(
+                    painter = rememberAsyncImagePainter(it),
+                    contentDescription = "Book Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(bottom = 16.dp)
+                        .clickable { onImageClick() }
+                        .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(16.dp))
+            )
+        } ?: Image(
+                painter = painterResource(id = R.drawable.ic_book),
+                contentDescription = "Book Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(bottom = 16.dp)
+                    .clickable { onImageClick() }
+                    .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(16.dp))
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+                value = title,
+                onValueChange = onTitleChange,
+                label = { Text("Title") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+                value = author,
+                onValueChange = onAuthorChange,
+                label = { Text("Author") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+                value = description,
+                onValueChange = onDescriptionChange,
+                label = { Text("Description of this book") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+                value = publishedYear,
+                onValueChange = onPublishedYearChange,
+                label = { Text("Published Year of this book") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+                onClick = onSaveClick,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+        ) {
+            Text("Save Changes")
+        }
+    }
+}
+
+
