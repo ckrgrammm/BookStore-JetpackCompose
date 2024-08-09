@@ -24,7 +24,8 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun RegisterScreen(navController: NavHostController) {
+fun RegisterScreen(navController: NavHostController)
+{
     val registerViewModel: RegisterViewModel = hiltViewModel()
 
     var userName by remember { mutableStateOf("") }
@@ -37,10 +38,104 @@ fun RegisterScreen(navController: NavHostController) {
 
     val isLoggedIn by registerViewModel.isLoggedIn.collectAsState()
     val errorMessage by registerViewModel.errorMessage.collectAsState()
-    val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(scaffoldState = scaffoldState) {
+    RegisterContent(
+            userName = userName,
+            onUserNameChange = { userName = it.trim() },
+            password = password,
+            onPasswordChange = { password = it },
+            rePassword = rePassword,
+            onRePasswordChange = { rePassword = it },
+            onRegisterClick = {
+                val user = User(
+                        id = 0,
+                        firstName = null,
+                        lastName = null,
+                        userName = userName,
+                        email = null,
+                        contactNumber = null,
+                        password = password,
+                        rePassword = rePassword,
+                        userStatus = null
+                )
+                coroutineScope.launch {
+                    when
+                    {
+                        !user.isPasswordValid() ->
+                        {
+                            dialogTitle = "Error"
+                            dialogMessage = "Passwords do not match."
+                            showDialog = true
+                        }
+
+                        !user.areFieldsNotEmpty() ->
+                        {
+                            dialogTitle = "Error"
+                            dialogMessage = "Please fill up all the required fields."
+                            showDialog = true
+                        }
+
+                        !user.isUsernameValid() ->
+                        {
+                            dialogTitle = "Error"
+                            dialogMessage = "Username should be between 4 - 10 characters."
+                            showDialog = true
+                        }
+
+                        registerViewModel.isUsernameTaken(userName) ->
+                        {
+                            dialogTitle = "Error"
+                            dialogMessage = "Username is already taken."
+                            showDialog = true
+                        }
+
+                        else ->
+                        {
+                            registerViewModel.register(user)
+                            dialogTitle = "Success"
+                            dialogMessage = "Registered Successfully!"
+                            showDialog = true
+                        }
+                    }
+                }
+            },
+            errorMessage = errorMessage,
+            showDialog = showDialog,
+            dialogTitle = dialogTitle,
+            dialogMessage = dialogMessage,
+            onDismissDialog = { showDialog = false },
+            onConfirmDialog = {
+                showDialog = false
+                if (dialogTitle == "Success")
+                {
+                    navController.navigate("login") {
+                        popUpTo("register") { inclusive = true }
+                    }
+                }
+            }
+    )
+}
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun RegisterContent(
+        userName: String,
+        onUserNameChange: (String) -> Unit,
+        password: String,
+        onPasswordChange: (String) -> Unit,
+        rePassword: String,
+        onRePasswordChange: (String) -> Unit,
+        onRegisterClick: () -> Unit,
+        errorMessage: String?,
+        showDialog: Boolean,
+        dialogTitle: String,
+        dialogMessage: String,
+        onDismissDialog: () -> Unit,
+        onConfirmDialog: () -> Unit
+)
+{
+    Scaffold {
         Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -78,7 +173,7 @@ fun RegisterScreen(navController: NavHostController) {
                 ) {
                     OutlinedTextField(
                             value = userName,
-                            onValueChange = { userName = it.trim() },
+                            onValueChange = onUserNameChange,
                             label = { Text("Username") },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -87,7 +182,7 @@ fun RegisterScreen(navController: NavHostController) {
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                             value = password,
-                            onValueChange = { password = it },
+                            onValueChange = onPasswordChange,
                             label = { Text("Password") },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -97,7 +192,7 @@ fun RegisterScreen(navController: NavHostController) {
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                             value = rePassword,
-                            onValueChange = { rePassword = it },
+                            onValueChange = onRePasswordChange,
                             label = { Text("Re-enter Password") },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -106,43 +201,7 @@ fun RegisterScreen(navController: NavHostController) {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                            onClick = {
-                                val user = User(
-                                        id = 0,
-                                        firstName = null,
-                                        lastName = null,
-                                        userName = userName,
-                                        email = null,
-                                        contactNumber = null,
-                                        password = password,
-                                        rePassword = rePassword,
-                                        userStatus = null
-                                )
-                                coroutineScope.launch {
-                                    if (!user.isPasswordValid()) {
-                                        dialogTitle = "Error"
-                                        dialogMessage = "Passwords do not match."
-                                        showDialog = true
-                                    } else if (!user.areFieldsNotEmpty()) {
-                                        dialogTitle = "Error"
-                                        dialogMessage = "Please fill up all the required fields."
-                                        showDialog = true
-                                    } else if(!user.isUsernameValid()){
-                                        dialogTitle = "Error"
-                                        dialogMessage = "Username should in between 4 - 10."
-                                        showDialog = true
-                                    }  else if (registerViewModel.isUsernameTaken(userName)) {
-                                        dialogTitle = "Error"
-                                        dialogMessage = "Username is already taken."
-                                        showDialog = true
-                                    } else {
-                                        registerViewModel.register(user)
-                                        dialogTitle = "Success"
-                                        dialogMessage = "Register Successfully!"
-                                        showDialog = true
-                                    }
-                                }
-                            },
+                            onClick = onRegisterClick,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp),
@@ -163,19 +222,13 @@ fun RegisterScreen(navController: NavHostController) {
                 }
             }
 
-            if (showDialog) {
+            if (showDialog)
+            {
                 CustomDialog(
                         title = dialogTitle,
                         message = dialogMessage,
-                        onDismiss = { showDialog = false },
-                        onConfirm = {
-                            showDialog = false
-                            if (dialogTitle == "Success") {
-                                navController.navigate("login") {
-                                    popUpTo("register") { inclusive = true }
-                                }
-                            }
-                        }
+                        onDismiss = onDismissDialog,
+                        onConfirm = onConfirmDialog
                 )
             }
         }

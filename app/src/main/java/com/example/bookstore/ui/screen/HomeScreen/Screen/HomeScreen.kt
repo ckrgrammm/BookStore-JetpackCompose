@@ -32,7 +32,12 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen(navController: NavHostController, bookDao: BookDao, currentUser: User) {
+fun HomeScreen(
+        navController: NavHostController,
+        bookDao: BookDao,
+        currentUser: User
+)
+{
     val coroutineScope = rememberCoroutineScope()
     var books by remember { mutableStateOf(emptyList<Book>()) }
 
@@ -51,61 +56,96 @@ fun HomeScreen(navController: NavHostController, bookDao: BookDao, currentUser: 
                 )
             }
     ) {
-        Column(
+        HomeContent(
+                books = books,
+                currentUser = currentUser,
+                onBookDeleted = { updatedBooks ->
+                    books = updatedBooks
+                },
+                onBookEdited = { bookId ->
+                    navController.navigate("editBook/$bookId")
+                },
+                onBookSelected = { bookId ->
+                    navController.navigate("bookDetail/$bookId")
+                },
+                bookDao = bookDao
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun HomeContent(
+        books: List<Book>,
+        currentUser: User,
+        onBookDeleted: (List<Book>) -> Unit,
+        onBookEdited: (Int) -> Unit,
+        onBookSelected: (Int) -> Unit,
+        bookDao: BookDao
+)
+{
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .background(MaterialTheme.colors.background)
+    ) {
+        LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
-                    .background(MaterialTheme.colors.background)
         ) {
-            LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-            ) {
-                items(books, key = { it.id }) { book ->
-                    val dismissState = rememberDismissState(
-                            confirmStateChange = {
-                                if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
-                                    coroutineScope.launch {
-                                        bookDao.deleteBook(book)
-                                        books = bookDao.getAllBooksSortedByDate()
+            items(books, key = { it.id }) { book ->
+                val dismissState = rememberDismissState(
+                        confirmStateChange = {
+                            if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart)
+                            {
+                                coroutineScope.launch {
+                                    bookDao.deleteBook(book)
+                                    val updatedBooks = bookDao.getAllBooksSortedByDate()
+                                    onBookDeleted(updatedBooks)
+                                }
+                            }
+                            true
+                        }
+                )
+                SwipeToDismiss(
+                        state = dismissState,
+                        directions = if (book.bookOwnerId == currentUser.id)
+                            setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart)
+                        else
+                            emptySet(),
+                        background = {
+                            val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
+                            val icon = Icons.Default.Delete
+                            val color = Color.Red
+                            Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(color)
+                                        .padding(horizontal = 20.dp),
+                                    contentAlignment = when (direction)
+                                    {
+                                        DismissDirection.StartToEnd -> Alignment.CenterStart
+                                        DismissDirection.EndToStart -> Alignment.CenterEnd
                                     }
-                                }
-                                true
+                            ) {
+                                Icon(icon, contentDescription = "Delete Icon", tint = Color.White)
                             }
-                    )
-                    SwipeToDismiss(
-                            state = dismissState,
-                            directions = if (book.bookOwnerId == currentUser.id)
-                                setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart)
-                            else
-                                emptySet(),
-                            background = {
-                                val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
-                                val icon = Icons.Default.Delete
-                                val color = Color.Red
-                                Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(color)
-                                            .padding(horizontal = 20.dp),
-                                        contentAlignment = when (direction) {
-                                            DismissDirection.StartToEnd -> Alignment.CenterStart
-                                            DismissDirection.EndToStart -> Alignment.CenterEnd
-                                        }
-                                ) {
-                                    Icon(icon, contentDescription = "Delete Icon", tint = Color.White)
-                                }
-                            },
-                            dismissContent = {
-                                BookItem(book, navController, currentUser, bookDao, books) { updatedBooks ->
-                                    books = updatedBooks
-                                }
-                            }
-                    )
-                }
+                        },
+                        dismissContent = {
+                            BookItem(
+                                    book = book,
+                                    currentUser = currentUser,
+                                    onBookSelected = onBookSelected,
+                                    onBookEdited = onBookEdited,
+                                    onBookDeleted = onBookDeleted,
+                                    bookDao = bookDao
+                            )
+                        }
+                )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -114,12 +154,13 @@ fun HomeScreen(navController: NavHostController, bookDao: BookDao, currentUser: 
 @Composable
 fun BookItem(
         book: Book,
-        navController: NavHostController,
         currentUser: User,
-        bookDao: BookDao,
-        books: List<Book>,
-        onBooksUpdate: (List<Book>) -> Unit
-) {
+        onBookSelected: (Int) -> Unit,
+        onBookEdited: (Int) -> Unit,
+        onBookDeleted: (List<Book>) -> Unit,
+        bookDao: BookDao
+)
+{
     val painter = rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current)
                 .data(book.imageUri)
@@ -135,7 +176,7 @@ fun BookItem(
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
                 .combinedClickable(
-                        onClick = { navController.navigate("bookDetail/${book.id}") },
+                        onClick = { onBookSelected(book.id) },
                         onLongClick = { showMenu = true }
                 ),
             elevation = 4.dp
@@ -161,13 +202,14 @@ fun BookItem(
                 Text(text = book.author, style = MaterialTheme.typography.body2, color = Color.Gray)
             }
 
-            if (showMenu && book.bookOwnerId == currentUser.id) {
+            if (showMenu && book.bookOwnerId == currentUser.id)
+            {
                 DropdownMenu(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                 ) {
                     DropdownMenuItem(onClick = {
-                        navController.navigate("editBook/${book.id}")
+                        onBookEdited(book.id)
                         showMenu = false
                     }) {
                         Text("Edit")
@@ -183,7 +225,8 @@ fun BookItem(
         }
     }
 
-    if (showDialog) {
+    if (showDialog)
+    {
         CustomDialog(
                 title = "Confirm Delete",
                 message = "Are you sure you want to delete this book?",
@@ -192,10 +235,11 @@ fun BookItem(
                     coroutineScope.launch {
                         bookDao.deleteBook(book)
                         val updatedBooks = bookDao.getAllBooksSortedByDate()
-                        onBooksUpdate(updatedBooks)
+                        onBookDeleted(updatedBooks)
                     }
                     showDialog = false
                 }
         )
     }
 }
+

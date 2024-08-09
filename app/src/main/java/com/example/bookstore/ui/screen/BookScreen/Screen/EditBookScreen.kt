@@ -34,7 +34,8 @@ fun EditBookScreen(
         navController: NavHostController,
         bookDao: BookDao,
         bookId: Int
-) {
+)
+{
     val coroutineScope = rememberCoroutineScope()
     var book by remember { mutableStateOf<Book?>(null) }
 
@@ -69,9 +70,12 @@ fun EditBookScreen(
     ) { uri: Uri? ->
         uri?.let {
             val savedPath = saveImageToInternalStorage(context, it)
-            if (savedPath != null) {
+            if (savedPath != null)
+            {
                 bookImage = savedPath
-            } else {
+            }
+            else
+            {
                 dialogTitle = "Error"
                 dialogMessage = "Failed to save image"
                 showDialog = true
@@ -102,11 +106,14 @@ fun EditBookScreen(
                     onImageClick = { imagePickerLauncher.launch("image/*") },
                     onSaveClick = {
                         val year = publishedYear.toIntOrNull()
-                        if (year == null) {
+                        if (year == null)
+                        {
                             dialogTitle = "Error"
                             dialogMessage = "Invalid published year"
                             showDialog = true
-                        } else {
+                        }
+                        else
+                        {
                             val updatedBook = it.copy(
                                     title = title,
                                     author = author,
@@ -116,19 +123,26 @@ fun EditBookScreen(
                             )
 
                             coroutineScope.launch {
-                                if (!updatedBook.isTitleValid()) {
+                                if (!updatedBook.isTitleValid())
+                                {
                                     dialogTitle = "Error"
                                     dialogMessage = "Title is required"
                                     showDialog = true
-                                } else if (!updatedBook.isAuthorValid()) {
+                                }
+                                else if (!updatedBook.isAuthorValid())
+                                {
                                     dialogTitle = "Error"
                                     dialogMessage = "Author is required"
                                     showDialog = true
-                                } else if (!updatedBook.isPublishedYearValid()) {
+                                }
+                                else if (!updatedBook.isPublishedYearValid())
+                                {
                                     dialogTitle = "Error"
                                     dialogMessage = "Published year must be after 1950"
                                     showDialog = true
-                                } else {
+                                }
+                                else
+                                {
                                     bookDao.updateBook(updatedBook)
                                     dialogTitle = "Success"
                                     dialogMessage = "Book updated successfully!"
@@ -140,7 +154,8 @@ fun EditBookScreen(
             )
         }
 
-        if (showDialog) {
+        if (showDialog)
+        {
             AlertDialog(
                     onDismissRequest = { showDialog = false },
                     title = { Text(dialogTitle) },
@@ -149,7 +164,8 @@ fun EditBookScreen(
                         Button(
                                 onClick = {
                                     showDialog = false
-                                    if (dialogTitle == "Success") {
+                                    if (dialogTitle == "Success")
+                                    {
                                         navController.navigate("home")
                                     }
                                 }
@@ -175,7 +191,8 @@ fun EditBookContent(
         bookImage: String?,
         onImageClick: () -> Unit,
         onSaveClick: () -> Unit
-) {
+)
+{
     Column(
             modifier = Modifier
                 .fillMaxSize()

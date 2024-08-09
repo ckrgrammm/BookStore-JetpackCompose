@@ -32,7 +32,8 @@ fun BookDetailScreen(
         navController: NavHostController,
         bookDao: BookDao,
         bookId: Int
-) {
+)
+{
     val coroutineScope = rememberCoroutineScope()
     var book by remember { mutableStateOf<Book?>(null) }
 
@@ -58,12 +59,12 @@ fun BookDetailScreen(
         book?.let {
             BookDetailContent(
                     book = it,
-                    onBackClick = { navController.navigateUp() },
-                    onEditClick = { navController.navigate("edit_book_screen/${it.id}") }
+                    onBackClick = { navController.navigateUp() }
             )
         }
 
-        if (showDialog) {
+        if (showDialog)
+        {
             AlertDialog(
                     onDismissRequest = { showDialog = false },
                     title = { Text(dialogTitle) },
@@ -83,9 +84,9 @@ fun BookDetailScreen(
 @Composable
 fun BookDetailContent(
         book: Book,
-        onBackClick: () -> Unit,
-        onEditClick: () -> Unit
-) {
+        onBackClick: () -> Unit
+)
+{
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
     val dateString = book.dateOfRegister?.let { dateFormat.format(it) } ?: "Unknown date"
 
@@ -143,15 +144,7 @@ fun BookDetailContent(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Button(
-                onClick = onEditClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(bottom = 8.dp)
-        ) {
-            Text("Edit Book")
-        }
+
 
         Button(
                 onClick = onBackClick,

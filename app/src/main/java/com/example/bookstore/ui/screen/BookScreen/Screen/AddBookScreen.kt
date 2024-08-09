@@ -33,7 +33,8 @@ fun AddBookScreen(
         navController: NavHostController,
         @ActualBookDao bookDao: BookDao,
         currentUser: User
-) {
+)
+{
     var title by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -53,9 +54,12 @@ fun AddBookScreen(
     ) { uri: Uri? ->
         uri?.let {
             val savedPath = saveImageToInternalStorage(context, it)
-            if (savedPath != null) {
+            if (savedPath != null)
+            {
                 bookImage = savedPath
-            } else {
+            }
+            else
+            {
                 coroutineScope.launch {
                     dialogTitle = "Error"
                     dialogMessage = "Failed to save image"
@@ -87,11 +91,14 @@ fun AddBookScreen(
                 onImageClick = { imagePickerLauncher.launch("image/*") },
                 onAddBookClick = {
                     val year = publishedYear.toIntOrNull()
-                    if (year == null) {
+                    if (year == null)
+                    {
                         dialogTitle = "Error"
                         dialogMessage = "Invalid published year"
                         showDialog = true
-                    } else {
+                    }
+                    else
+                    {
                         val newBook = Book(
                                 title = title,
                                 author = author,
@@ -102,19 +109,26 @@ fun AddBookScreen(
                                 imageUri = bookImage
                         )
 
-                        if (!newBook.isTitleValid()) {
+                        if (!newBook.isTitleValid())
+                        {
                             dialogTitle = "Error"
                             dialogMessage = "Title is required"
                             showDialog = true
-                        } else if (!newBook.isAuthorValid()) {
+                        }
+                        else if (!newBook.isAuthorValid())
+                        {
                             dialogTitle = "Error"
                             dialogMessage = "Author is required"
                             showDialog = true
-                        } else if (!newBook.isPublishedYearValid()) {
+                        }
+                        else if (!newBook.isPublishedYearValid())
+                        {
                             dialogTitle = "Error"
                             dialogMessage = "Published year must be after 1950"
                             showDialog = true
-                        } else {
+                        }
+                        else
+                        {
                             coroutineScope.launch {
                                 bookDao.insertBook(newBook)
                                 dialogTitle = "Success"
@@ -126,7 +140,8 @@ fun AddBookScreen(
                 }
         )
 
-        if (showDialog) {
+        if (showDialog)
+        {
             AlertDialog(
                     onDismissRequest = { showDialog = false },
                     title = { Text(dialogTitle) },
@@ -135,7 +150,8 @@ fun AddBookScreen(
                         Button(
                                 onClick = {
                                     showDialog = false
-                                    if (dialogTitle == "Success") {
+                                    if (dialogTitle == "Success")
+                                    {
                                         navController.navigate("home")
                                     }
                                 }

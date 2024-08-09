@@ -21,12 +21,12 @@ import com.example.bookstore.common.CustomDialog
 import com.example.bookstore.data.model.User
 import com.example.bookstore.ui.screen.UserScreen.ViewModel.LoginViewModel
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(
         navController: NavHostController,
         onLoginSuccess: (User) -> Unit
-) {
+)
+{
     val loginViewModel: LoginViewModel = hiltViewModel()
 
     var userName by remember { mutableStateOf("") }
@@ -38,18 +38,55 @@ fun LoginScreen(
 
     val isLoginSuccessful by loginViewModel.isLoginSuccessful.collectAsState()
     val errorMessage by loginViewModel.errorMessage.collectAsState()
+
+    LaunchedEffect(isLoginSuccessful, errorMessage) {
+        if (isLoginSuccessful)
+        {
+            loginViewModel.currentUser?.let { onLoginSuccess(it) }
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+        else if (errorMessage != null)
+        {
+            dialogTitle = "Error"
+            dialogMessage = errorMessage ?: "Invalid Credentials, Try again!"
+            showDialog = true
+        }
+    }
+
+    LoginContent(
+            userName = userName,
+            onUserNameChange = { userName = it.trim() },
+            password = password,
+            onPasswordChange = { password = it },
+            onLoginClick = { loginViewModel.login(userName, password) },
+            onRegisterClick = { navController.navigate("register") },
+            showDialog = showDialog,
+            dialogTitle = dialogTitle,
+            dialogMessage = dialogMessage,
+            onDismissDialog = { showDialog = false }
+    )
+}
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun LoginContent(
+        userName: String,
+        onUserNameChange: (String) -> Unit,
+        password: String,
+        onPasswordChange: (String) -> Unit,
+        onLoginClick: () -> Unit,
+        onRegisterClick: () -> Unit,
+        showDialog: Boolean,
+        dialogTitle: String,
+        dialogMessage: String,
+        onDismissDialog: () -> Unit
+)
+{
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(scaffoldState = scaffoldState) {
-        if (isLoginSuccessful) {
-            LaunchedEffect(isLoginSuccessful) {
-                loginViewModel.currentUser?.let { onLoginSuccess(it) }
-                navController.navigate("home") {
-                    popUpTo("login") { inclusive = true }
-                }
-            }
-        }
-
         Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -91,7 +128,7 @@ fun LoginScreen(
 
                     OutlinedTextField(
                             value = userName,
-                            onValueChange = { userName = it.trim() },
+                            onValueChange = onUserNameChange,
                             label = { Text("Username") },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -100,7 +137,7 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                             value = password,
-                            onValueChange = { password = it },
+                            onValueChange = onPasswordChange,
                             label = { Text("Password") },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -109,9 +146,7 @@ fun LoginScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                            onClick = {
-                                loginViewModel.login(userName, password)
-                            },
+                            onClick = onLoginClick,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp),
@@ -128,33 +163,23 @@ fun LoginScreen(
                             color = Color(0xFF6200EE),
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
-                                .clickable {
-                                    navController.navigate("register")
-                                }
+                                .clickable { onRegisterClick() }
                     )
                 }
             }
         }
 
-        if (!isLoginSuccessful && errorMessage != null) {
-            LaunchedEffect(errorMessage) {
-                dialogTitle = "Error"
-                dialogMessage = errorMessage ?: "Invalid Credentials, Try again!"
-                showDialog = true
-            }
-        }
-
-        if (showDialog) {
+        if (showDialog)
+        {
             CustomDialog(
                     title = dialogTitle,
                     message = dialogMessage,
-                    onDismiss = { showDialog = false },
-                    onConfirm = {
-                        showDialog = false
-                    }
+                    onDismiss = onDismissDialog,
+                    onConfirm = onDismissDialog
             )
         }
-
     }
 }
+
+
 

@@ -2,10 +2,7 @@ package com.example.bookstore.ui.screen.UserScreen.Screen
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -22,7 +19,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.bookstore.R
 import com.example.bookstore.common.CustomDialog
@@ -30,32 +26,12 @@ import com.example.bookstore.common.UserSession
 import com.example.bookstore.common.saveImageToInternalStorage
 import com.example.bookstore.data.dao.UserDao
 import com.example.bookstore.data.model.User
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-@AndroidEntryPoint
-class UserScreenWrapper : ComponentActivity() {
-    @Inject
-    lateinit var userDao: UserDao
-
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            val currentUser = UserSession.getCurrentUser()
-            val navController = rememberNavController()
-
-            currentUser?.let {
-                UserScreen(navController, userDao, it)
-            }
-        }
-    }
-}
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: User) {
+fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: User)
+{
     var firstName by remember { mutableStateOf(currentUser.firstName ?: "") }
     var lastName by remember { mutableStateOf(currentUser.lastName ?: "") }
     var email by remember { mutableStateOf(currentUser.email ?: "") }
@@ -65,7 +41,6 @@ fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: 
     var dialogTitle by remember { mutableStateOf("") }
     var dialogMessage by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
-    var navigateToLogin by remember { mutableStateOf(false) }
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -76,9 +51,12 @@ fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: 
     ) { uri: Uri? ->
         uri?.let {
             val savedPath = saveImageToInternalStorage(context, it)
-            if (savedPath != null) {
+            if (savedPath != null)
+            {
                 userProfile = savedPath
-            } else {
+            }
+            else
+            {
                 dialogTitle = "Error"
                 dialogMessage = "Failed to save image"
                 showDialog = true
@@ -86,12 +64,87 @@ fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: 
         }
     }
 
+    UserScreenContent(
+            firstName = firstName,
+            onFirstNameChange = { firstName = it },
+            lastName = lastName,
+            onLastNameChange = { lastName = it },
+            email = email,
+            onEmailChange = { email = it },
+            contactNumber = contactNumber,
+            onContactNumberChange = { contactNumber = it },
+            userProfile = userProfile,
+            onProfileImageClick = { imagePickerLauncher.launch("image/*") },
+            onUpdateClick = {
+                coroutineScope.launch {
+                    val updatedUser = currentUser.copy(
+                            firstName = firstName,
+                            lastName = lastName,
+                            email = email,
+                            contactNumber = contactNumber,
+                            userProfile = userProfile
+                    )
+                    if (updatedUser.isEmailValid() && updatedUser.isContactNumberValid())
+                    {
+                        userDao.updateUser(updatedUser)
+                        UserSession.login(updatedUser)
+                        dialogTitle = "Success"
+                        dialogMessage = "Profile updated successfully."
+                        showDialog = true
+                    }
+                    else
+                    {
+                        dialogTitle = "Error"
+                        dialogMessage = "Please fill up all the required fields correctly."
+                        showDialog = true
+                    }
+                }
+            },
+            onLogoutClick = {
+                UserSession.logout()
+                navController.navigate("login") {
+                    popUpTo("home") { inclusive = true }
+                }
+            },
+            showDialog = showDialog,
+            dialogTitle = dialogTitle,
+            dialogMessage = dialogMessage,
+            onDismissDialog = { showDialog = false },
+            onConfirmDialog = {
+                showDialog = false
+                if (dialogTitle == "Success")
+                {
+                    navController.popBackStack()
+                }
+            }
+    )
+}
+
+@Composable
+fun UserScreenContent(
+        firstName: String,
+        onFirstNameChange: (String) -> Unit,
+        lastName: String,
+        onLastNameChange: (String) -> Unit,
+        email: String,
+        onEmailChange: (String) -> Unit,
+        contactNumber: String,
+        onContactNumberChange: (String) -> Unit,
+        userProfile: String?,
+        onProfileImageClick: () -> Unit,
+        onUpdateClick: () -> Unit,
+        onLogoutClick: () -> Unit,
+        showDialog: Boolean,
+        dialogTitle: String,
+        dialogMessage: String,
+        onDismissDialog: () -> Unit,
+        onConfirmDialog: () -> Unit
+)
+{
     Scaffold(
-            scaffoldState = scaffoldState,
+            scaffoldState = rememberScaffoldState(),
             topBar = {
-                TopAppBar(
-                        title = { Text("User Profile") }
-                )
+                TopAppBar(title = { Text("User Profile") })
             }
     ) {
         Column(
@@ -110,7 +163,7 @@ fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: 
                             .size(250.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .clip(CircleShape)
-                            .clickable { imagePickerLauncher.launch("image/*") }
+                            .clickable { onProfileImageClick() }
                 )
             } ?: Image(
                     painter = painterResource(id = R.drawable.ic_default_profile),
@@ -119,7 +172,7 @@ fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: 
                         .size(250.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .clip(CircleShape)
-                        .clickable { imagePickerLauncher.launch("image/*") }
+                        .clickable { onProfileImageClick() }
             )
 
             Text(text = "Edit Profile", fontSize = 24.sp)
@@ -127,7 +180,7 @@ fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: 
 
             OutlinedTextField(
                     value = firstName,
-                    onValueChange = { firstName = it },
+                    onValueChange = onFirstNameChange,
                     label = { Text("First Name") },
                     modifier = Modifier.fillMaxWidth()
             )
@@ -135,7 +188,7 @@ fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: 
 
             OutlinedTextField(
                     value = lastName,
-                    onValueChange = { lastName = it },
+                    onValueChange = onLastNameChange,
                     label = { Text("Last Name") },
                     modifier = Modifier.fillMaxWidth()
             )
@@ -143,7 +196,7 @@ fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: 
 
             OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = onEmailChange,
                     label = { Text("Email") },
                     modifier = Modifier.fillMaxWidth()
             )
@@ -151,35 +204,14 @@ fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: 
 
             OutlinedTextField(
                     value = contactNumber,
-                    onValueChange = { contactNumber = it },
+                    onValueChange = onContactNumberChange,
                     label = { Text("Contact Number") },
                     modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            val updatedUser = currentUser.copy(
-                                    firstName = firstName,
-                                    lastName = lastName,
-                                    email = email,
-                                    contactNumber = contactNumber,
-                                    userProfile = userProfile
-                            )
-                            if (updatedUser.isEmailValid() && updatedUser.isContactNumberValid()) {
-                                userDao.updateUser(updatedUser)
-                                UserSession.login(updatedUser)
-                                dialogTitle = "Success"
-                                dialogMessage = "Profile updated successfully."
-                                showDialog = true
-                            } else {
-                                dialogTitle = "Error"
-                                dialogMessage = "Please fill up all the required fields correctly."
-                                showDialog = true
-                            }
-                        }
-                    },
+                    onClick = onUpdateClick,
                     modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Update")
@@ -188,30 +220,23 @@ fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                    onClick = {
-                        UserSession.logout()
-                        navController.navigate("login") {
-                            popUpTo("home") { inclusive = true }
-                        }
-                    },
+                    onClick = onLogoutClick,
                     modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Logout")
             }
         }
 
-        if (showDialog) {
+        if (showDialog)
+        {
             CustomDialog(
                     title = dialogTitle,
                     message = dialogMessage,
-                    onDismiss = { showDialog = false },
-                    onConfirm = {
-                        showDialog = false
-                        if (dialogTitle == "Success") {
-                            navController.popBackStack()
-                        }
-                    }
+                    onDismiss = onDismissDialog,
+                    onConfirm = onConfirmDialog
             )
         }
     }
 }
+
+
