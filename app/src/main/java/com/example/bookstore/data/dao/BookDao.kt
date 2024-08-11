@@ -8,22 +8,22 @@ import androidx.room.Update
 import com.example.bookstore.data.model.Book
 
 @Dao
-interface BookDao {
+interface BookDao : CommonBookDao {
     @Insert
-    suspend fun insertBook(book: Book): Long
+    override suspend fun insertBook(book: Book): Long
 
     @Query("SELECT * FROM books")
-    suspend fun getAllBooks(): List<Book>
+    override suspend fun getAllBooks(): List<Book>
 
     @Query("SELECT * FROM books WHERE id = :bookId")
-    suspend fun getBookById(bookId: Int): Book
+    override suspend fun getBookById(bookId: Int): Book
 
     @Delete
-    suspend fun deleteBook(book: Book)
+    override suspend fun deleteBook(book: Book)
 
     @Query("SELECT * FROM books ORDER BY dateOfRegister DESC")
-    suspend fun getAllBooksSortedByDate(): List<Book>
+    override suspend fun getAllBooksSortedByDate(): List<Book>
 
     @Update
-    suspend fun updateBook(book: Book)
+    override suspend fun updateBook(book: Book)
 }

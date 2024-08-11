@@ -21,6 +21,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.bookstore.R
 import com.example.bookstore.common.saveImageToInternalStorage
 import com.example.bookstore.data.dao.BookDao
+import com.example.bookstore.data.dao.CommonBookDao
+import com.example.bookstore.data.di.Actual
 import com.example.bookstore.data.di.ActualBookDao
 import com.example.bookstore.data.model.Book
 import com.example.bookstore.data.model.User
@@ -30,9 +32,9 @@ import java.util.*
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AddBookScreen(
-        navController: NavHostController,
-        @ActualBookDao bookDao: BookDao,
-        currentUser: User
+    navController: NavHostController,
+    @Actual bookDao: CommonBookDao,
+    currentUser: User
 )
 {
     var title by remember { mutableStateOf("") }

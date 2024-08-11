@@ -3,10 +3,12 @@ package com.example.bookstore.data.repository
 import com.example.bookstore.data.dao.UserDao
 import com.example.bookstore.data.di.ActualUserDao
 import com.example.bookstore.data.di.MockUserDao
+import com.example.bookstore.data.model.User
 import javax.inject.Inject
 
-class UserRepository @Inject constructor(
-        @ActualUserDao private val actualUserDao: UserDao,
-        @MockUserDao private val mockUserDao: UserDao
-) {
+interface UserRepository {
+        suspend fun insertUser(user: User): Long
+        suspend fun getUser(userName: String, password: String): User?
+        suspend fun updateUser(user: User)
+        suspend fun getUserByUsername(userName: String): User?
 }
