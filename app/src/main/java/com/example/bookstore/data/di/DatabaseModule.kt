@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.bookstore.data.dao.BookDao
 import com.example.bookstore.data.dao.CommonBookDao
 import com.example.bookstore.data.dao.IBookDao
+import com.example.bookstore.data.dao.MockBookDaoClass
 import com.example.bookstore.data.dao.UserDao
 import com.example.bookstore.data.database.AppDatabase
 import com.example.bookstore.data.model.Book
@@ -57,7 +58,7 @@ object DatabaseModule {
     @MockBookDao
     @Provides
     fun provideMockBookDao(): IBookDao {
-        return MockBookDao()
+        return MockBookDaoClass()
     }
 
 

@@ -4,7 +4,7 @@ import com.example.bookstore.data.model.Book
 import java.util.Date
 
 
-class MockBookDao : IBookDao {
+class MockBookDaoClass : IBookDao {
     override suspend fun insertBook(book: Book): Long {
         return -1L
     }
