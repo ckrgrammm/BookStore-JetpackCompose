@@ -27,7 +27,8 @@ import com.example.bookstore.data.dao.UserDao
 
 @AndroidEntryPoint
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity()
+{
 
     @Inject
     lateinit var bookDao: BookDao
@@ -35,7 +36,8 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var userDao: UserDao
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
@@ -46,7 +48,8 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         val navBackStackEntry by navController.currentBackStackEntryAsState()
                         val currentRoute = navBackStackEntry?.destination?.route
-                        if (currentRoute !in listOf("login", "register")) {
+                        if (currentRoute !in listOf("login", "register"))
+                        {
                             BottomNavigationBar(navController = navController)
                         }
                     }
@@ -63,15 +66,6 @@ class MainActivity : ComponentActivity() {
                     composable("register") {
                         RegisterScreen(navController)
                     }
-//                    composable("home") {
-//                        currentUser?.let { HomeScreen(navController, bookDao, it) }
-//                    }
-//                    composable("addBook") {
-//                        currentUser?.let { AddBookScreen(navController, bookDao, it) }
-//                    }
-//                    composable("user") {
-//                        currentUser?.let { UserScreen(navController, userDao, it) }
-//                    }
                     composable("bookDetail/{bookId}") { backStackEntry ->
                         val bookId = backStackEntry.arguments?.getString("bookId")?.toIntOrNull()
                         bookId?.let { BookDetailScreen(navController, bookDao, it) }

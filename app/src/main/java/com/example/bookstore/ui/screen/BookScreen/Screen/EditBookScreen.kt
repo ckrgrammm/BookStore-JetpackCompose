@@ -12,24 +12,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.bookstore.R
-import com.example.bookstore.common.CustomDialog
 import com.example.bookstore.common.saveImageToInternalStorage
-import com.example.bookstore.data.dao.BookDao
-import com.example.bookstore.data.dao.IBookDao
+import com.example.bookstore.data.ipackage.IBookDao
 import com.example.bookstore.data.di.ActualBookDao
 import com.example.bookstore.data.model.Book
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")

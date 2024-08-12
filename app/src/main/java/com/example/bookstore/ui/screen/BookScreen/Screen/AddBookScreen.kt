@@ -14,16 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.bookstore.R
 import com.example.bookstore.common.saveImageToInternalStorage
-import com.example.bookstore.data.dao.BookDao
-import com.example.bookstore.data.dao.CommonBookDao
-import com.example.bookstore.data.dao.IBookDao
-import com.example.bookstore.data.di.Actual
+import com.example.bookstore.data.ipackage.IBookDao
 import com.example.bookstore.data.di.ActualBookDao
 import com.example.bookstore.data.model.Book
 import com.example.bookstore.data.model.User
@@ -33,9 +29,9 @@ import java.util.*
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AddBookScreen(
-    navController: NavHostController,
-    @ActualBookDao bookDao: IBookDao,
-    currentUser: User
+        navController: NavHostController,
+        @ActualBookDao bookDao: IBookDao,
+        currentUser: User
 )
 {
     var title by remember { mutableStateOf("") }

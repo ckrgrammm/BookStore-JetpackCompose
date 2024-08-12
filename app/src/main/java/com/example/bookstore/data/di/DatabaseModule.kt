@@ -3,12 +3,12 @@ package com.example.bookstore.data.di
 import android.content.Context
 import androidx.room.Room
 import com.example.bookstore.data.dao.BookDao
-import com.example.bookstore.data.dao.CommonBookDao
-import com.example.bookstore.data.dao.IBookDao
+import com.example.bookstore.data.ipackage.IBookDao
 import com.example.bookstore.data.dao.MockBookDaoClass
+import com.example.bookstore.data.dao.MockUserDaoClass
 import com.example.bookstore.data.dao.UserDao
 import com.example.bookstore.data.database.AppDatabase
-import com.example.bookstore.data.model.Book
+import com.example.bookstore.data.ipackage.IUserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,8 +33,7 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideBookDao(appDatabase: AppDatabase): BookDao
-    {
+    fun provideBookDao(appDatabase: AppDatabase): BookDao {
         return appDatabase.bookDao()
     }
 
@@ -45,26 +44,28 @@ object DatabaseModule {
         return appDatabase.bookDao()
     }
 
-//    @MockBookDao
-//    @Provides
-//    fun provideMockBookDao(bookDao: BookDao): IBookDao {
-//        return object : IBookDao by bookDao {
-//            override suspend fun insertBook(book: Book): Long {
-//                return -1L
-//            }
-//        }
-//    }
-
     @MockBookDao
     @Provides
     fun provideMockBookDao(): IBookDao {
         return MockBookDaoClass()
     }
 
-
     @Provides
     @Singleton
     fun provideUserDao(appDatabase: AppDatabase): UserDao {
         return appDatabase.userDao()
+    }
+
+    @ActualUserDao
+    @Provides
+    @Singleton
+    fun provideActualUserDao(appDatabase: AppDatabase): IUserDao {
+        return appDatabase.userDao()
+    }
+
+    @MockUserDao
+    @Provides
+    fun provideMockUserDao(): IUserDao {
+        return MockUserDaoClass()
     }
 }

@@ -9,11 +9,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.bookstore.data.dao.UserDao
+import com.example.bookstore.data.di.ActualUserDao
+import com.example.bookstore.data.ipackage.IUserDao
 import com.example.bookstore.data.model.User
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-        private val userDao: UserDao
+        @ActualUserDao private val userDao: IUserDao
 ) : ViewModel() {
 
     private val _isLoggedIn = MutableStateFlow(false)

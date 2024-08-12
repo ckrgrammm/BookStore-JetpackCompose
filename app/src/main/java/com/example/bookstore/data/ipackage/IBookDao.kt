@@ -1,4 +1,4 @@
-package com.example.bookstore.data.dao
+package com.example.bookstore.data.ipackage
 
 import com.example.bookstore.data.model.Book
 

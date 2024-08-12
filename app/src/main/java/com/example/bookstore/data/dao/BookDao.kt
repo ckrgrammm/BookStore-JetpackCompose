@@ -5,10 +5,12 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.example.bookstore.data.ipackage.IBookDao
 import com.example.bookstore.data.model.Book
 
 @Dao
-interface BookDao : IBookDao {
+interface BookDao : IBookDao
+{
     @Insert
     override suspend fun insertBook(book: Book): Long
 

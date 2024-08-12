@@ -1,10 +1,12 @@
 package com.example.bookstore.data.dao
 
+import com.example.bookstore.data.ipackage.IBookDao
 import com.example.bookstore.data.model.Book
 import java.util.Date
 
 
-class MockBookDaoClass : IBookDao {
+class MockBookDaoClass : IBookDao
+{
     override suspend fun insertBook(book: Book): Long {
         return -1L
     }

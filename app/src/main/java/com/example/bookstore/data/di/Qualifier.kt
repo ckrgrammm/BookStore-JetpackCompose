@@ -18,6 +18,3 @@ annotation class ActualBookDao
 @Retention(AnnotationRetention.BINARY)
 annotation class MockBookDao
 
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class Actual
