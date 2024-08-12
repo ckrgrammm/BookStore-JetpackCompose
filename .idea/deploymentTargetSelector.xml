@@ -13,10 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="AddBookScreenTest">
+      <SelectionState runConfigName="testUserScreen_initialState()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testButtonClick()">
+      <SelectionState runConfigName="UserScreenTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="testUserScreen_updateProfileSuccess()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="testUserScreen_updateProfileFailure()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="testUserScreen_logout()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

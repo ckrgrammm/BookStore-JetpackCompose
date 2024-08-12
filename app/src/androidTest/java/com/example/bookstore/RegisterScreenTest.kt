@@ -8,6 +8,7 @@ import com.example.bookstore.data.dao.MockUserDaoClass
 import com.example.bookstore.data.ipackage.IUserDao
 import com.example.bookstore.ui.screen.UserScreen.Screen.RegisterScreen
 import com.example.bookstore.ui.theme.BookStoreTheme
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

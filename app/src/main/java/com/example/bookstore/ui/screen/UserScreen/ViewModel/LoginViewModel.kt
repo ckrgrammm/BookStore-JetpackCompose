@@ -10,12 +10,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.example.bookstore.data.dao.UserDao
+import com.example.bookstore.data.di.ActualUserDao
+import com.example.bookstore.data.ipackage.IUserDao
 import com.example.bookstore.data.model.User
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-        private val userDao: UserDao
-) : ViewModel() {
+        @ActualUserDao private val userDao: IUserDao
+) : ViewModel()
+{
     private val _isLoginSuccessful = MutableStateFlow(false)
     val isLoginSuccessful: StateFlow<Boolean> = _isLoginSuccessful
 
@@ -25,26 +28,36 @@ class LoginViewModel @Inject constructor(
     var currentUser: User? = null
         private set
 
-    fun login(userName: String, password: String) {
+    fun login(userName: String, password: String)
+    {
         viewModelScope.launch {
-            try {
+            try
+            {
                 val user = withContext(Dispatchers.IO) {
                     userDao.getUserByUsername(userName)
                 }
 
-                if (user != null) {
-                    if (user.password == password) {
+                if (user != null)
+                {
+                    if (user.password == password)
+                    {
                         currentUser = user
                         _isLoginSuccessful.value = true
-                    } else {
+                    }
+                    else
+                    {
                         _isLoginSuccessful.value = false
                         _errorMessage.value = "Invalid password"
                     }
-                } else {
+                }
+                else
+                {
                     _isLoginSuccessful.value = false
                     _errorMessage.value = "No account found with this username"
                 }
-            } catch (e: Exception) {
+            }
+            catch (e: Exception)
+            {
                 _isLoginSuccessful.value = false
                 _errorMessage.value = e.message
             }
@@ -52,8 +65,8 @@ class LoginViewModel @Inject constructor(
     }
 
 
-
-    fun clearErrorMessage() {
+    fun clearErrorMessage()
+    {
         _errorMessage.value = null
     }
 }

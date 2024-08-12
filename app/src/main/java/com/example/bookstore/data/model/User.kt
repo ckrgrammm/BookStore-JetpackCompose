@@ -38,6 +38,16 @@ data class User(
         return contactNumber!!.length >= 10
     }
 
+    fun isFirstNameValid(): Boolean
+    {
+        return firstName!!.length in 4..16
+    }
+
+    fun isLastNameValid(): Boolean
+    {
+        return lastName!!.length in 4..16
+    }
+
     fun areFieldsNotEmpty(): Boolean
     {
         return userName.isNotBlank() &&

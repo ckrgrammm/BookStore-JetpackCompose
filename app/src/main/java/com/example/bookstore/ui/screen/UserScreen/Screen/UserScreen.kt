@@ -25,12 +25,19 @@ import com.example.bookstore.common.CustomDialog
 import com.example.bookstore.common.UserSession
 import com.example.bookstore.common.saveImageToInternalStorage
 import com.example.bookstore.data.dao.UserDao
+import com.example.bookstore.data.di.ActualBookDao
+import com.example.bookstore.data.di.ActualUserDao
+import com.example.bookstore.data.ipackage.IBookDao
+import com.example.bookstore.data.ipackage.IUserDao
 import com.example.bookstore.data.model.User
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: User)
+fun UserScreen(
+        navController: NavHostController,
+        @ActualUserDao userDao: IUserDao,
+        currentUser: User)
 {
     var firstName by remember { mutableStateOf(currentUser.firstName ?: "") }
     var lastName by remember { mutableStateOf(currentUser.lastName ?: "") }
@@ -84,7 +91,8 @@ fun UserScreen(navController: NavHostController, userDao: UserDao, currentUser: 
                             contactNumber = contactNumber,
                             userProfile = userProfile
                     )
-                    if (updatedUser.isEmailValid() && updatedUser.isContactNumberValid())
+                    if (updatedUser.isEmailValid() && updatedUser.isContactNumberValid() && updatedUser.isFirstNameValid()
+                        && updatedUser.isLastNameValid())
                     {
                         userDao.updateUser(updatedUser)
                         UserSession.login(updatedUser)
@@ -139,12 +147,19 @@ fun UserScreenContent(
         dialogMessage: String,
         onDismissDialog: () -> Unit,
         onConfirmDialog: () -> Unit
-)
-{
+) {
     Scaffold(
             scaffoldState = rememberScaffoldState(),
             topBar = {
-                TopAppBar(title = { Text("User Profile") })
+                TopAppBar(
+                        title = { Text("User Profile") },
+                        actions = {
+                            IconButton(onClick = { onLogoutClick() }) {
+                                Icon(painterResource(id = R.drawable.ic_logout), contentDescription = "Logout",
+                                        modifier = Modifier.size(75.dp) )
+                            }
+                        }
+                )
             }
     ) {
         Column(
@@ -227,8 +242,7 @@ fun UserScreenContent(
             }
         }
 
-        if (showDialog)
-        {
+        if (showDialog) {
             CustomDialog(
                     title = dialogTitle,
                     message = dialogMessage,
@@ -238,5 +252,3 @@ fun UserScreenContent(
         }
     }
 }
-
-
