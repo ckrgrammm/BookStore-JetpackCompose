@@ -22,6 +22,7 @@ import com.example.bookstore.R
 import com.example.bookstore.common.saveImageToInternalStorage
 import com.example.bookstore.data.dao.BookDao
 import com.example.bookstore.data.dao.CommonBookDao
+import com.example.bookstore.data.dao.IBookDao
 import com.example.bookstore.data.di.Actual
 import com.example.bookstore.data.di.ActualBookDao
 import com.example.bookstore.data.model.Book
@@ -33,7 +34,7 @@ import java.util.*
 @Composable
 fun AddBookScreen(
     navController: NavHostController,
-    @Actual bookDao: CommonBookDao,
+    @ActualBookDao bookDao: IBookDao,
     currentUser: User
 )
 {

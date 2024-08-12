@@ -1,10 +1,6 @@
 package com.example.bookstore.data.repository
 
-import com.example.bookstore.data.dao.BookDao
-import com.example.bookstore.data.di.ActualBookDao
-import com.example.bookstore.data.di.MockBookDao
 import com.example.bookstore.data.model.Book
-import javax.inject.Inject
 
 interface BookRepository {
         suspend fun insertBook(book: Book): Long

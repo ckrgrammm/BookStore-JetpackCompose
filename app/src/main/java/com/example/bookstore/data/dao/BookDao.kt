@@ -8,7 +8,7 @@ import androidx.room.Update
 import com.example.bookstore.data.model.Book
 
 @Dao
-interface BookDao : CommonBookDao {
+interface BookDao : IBookDao {
     @Insert
     override suspend fun insertBook(book: Book): Long
 
