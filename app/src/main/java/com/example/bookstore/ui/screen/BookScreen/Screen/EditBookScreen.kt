@@ -2,6 +2,7 @@ package com.example.bookstore.ui.screen.BookScreen.Screen
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +26,8 @@ import com.example.bookstore.R
 import com.example.bookstore.common.CustomDialog
 import com.example.bookstore.common.saveImageToInternalStorage
 import com.example.bookstore.data.dao.BookDao
+import com.example.bookstore.data.dao.IBookDao
+import com.example.bookstore.data.di.ActualBookDao
 import com.example.bookstore.data.model.Book
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -32,7 +36,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun EditBookScreen(
         navController: NavHostController,
-        bookDao: BookDao,
+        @ActualBookDao bookDao: IBookDao,
         bookId: Int
 )
 {
@@ -147,6 +151,7 @@ fun EditBookScreen(
                                     dialogTitle = "Success"
                                     dialogMessage = "Book updated successfully!"
                                     showDialog = true
+                                    Log.d("EditBookScreen", "Dialog Msg showed $dialogTitle")
                                 }
                             }
                         }
