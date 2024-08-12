@@ -175,7 +175,7 @@ fun UserScreenContent(
                         painter = rememberAsyncImagePainter(it),
                         contentDescription = "Profile Picture",
                         modifier = Modifier
-                            .size(250.dp)
+                            .size(150.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .clip(CircleShape)
                             .clickable { onProfileImageClick() }
@@ -184,7 +184,7 @@ fun UserScreenContent(
                     painter = painterResource(id = R.drawable.ic_default_profile),
                     contentDescription = "Profile Picture",
                     modifier = Modifier
-                        .size(250.dp)
+                        .size(150.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .clip(CircleShape)
                         .clickable { onProfileImageClick() }
@@ -234,12 +234,6 @@ fun UserScreenContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                    onClick = onLogoutClick,
-                    modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Logout")
-            }
         }
 
         if (showDialog) {

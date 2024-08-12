@@ -4,11 +4,10 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.bookstore.data.dao.MockUserDaoClass
+import com.example.bookstore.data.mock.MockUserDaoClass
 import com.example.bookstore.data.ipackage.IUserDao
 import com.example.bookstore.ui.screen.UserScreen.Screen.RegisterScreen
 import com.example.bookstore.ui.theme.BookStoreTheme
-import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,9 +39,9 @@ class RegisterScreenTest {
     @Test
     fun testRegisterScreen_initialState() {
         composeTestRule.onNodeWithText("Book Store Register").assertIsDisplayed()
-//        composeTestRule.onNodeWithText("Username").assertIsDisplayed()
-//        composeTestRule.onNodeWithText("Password").assertIsDisplayed()
-//        composeTestRule.onNodeWithText("Re-enter Password").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Username").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Password").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Re-enter Password").assertIsDisplayed()
     }
 
     @Test

@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.example.bookstore.data.dao.BookDao
 import com.example.bookstore.data.ipackage.IBookDao
-import com.example.bookstore.data.dao.MockBookDaoClass
-import com.example.bookstore.data.dao.MockUserDaoClass
+import com.example.bookstore.data.mock.MockBookDaoClass
+import com.example.bookstore.data.mock.MockUserDaoClass
 import com.example.bookstore.data.dao.UserDao
 import com.example.bookstore.data.database.AppDatabase
 import com.example.bookstore.data.ipackage.IUserDao

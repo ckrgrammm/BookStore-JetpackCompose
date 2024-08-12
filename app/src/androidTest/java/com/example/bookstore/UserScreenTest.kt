@@ -4,13 +4,12 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.bookstore.data.dao.MockUserDaoClass
+import com.example.bookstore.data.mock.MockUserDaoClass
 import com.example.bookstore.data.ipackage.IUserDao
 import com.example.bookstore.data.model.User
 import com.example.bookstore.ui.screen.UserScreen.Screen.UserScreen
 import com.example.bookstore.ui.theme.BookStoreTheme
 import kotlinx.coroutines.runBlocking
-import okhttp3.internal.tls.OkHostnameVerifier.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

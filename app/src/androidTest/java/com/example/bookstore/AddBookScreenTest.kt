@@ -5,7 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.bookstore.data.ipackage.IBookDao
-import com.example.bookstore.data.dao.MockBookDaoClass
+import com.example.bookstore.data.mock.MockBookDaoClass
 import com.example.bookstore.data.model.User
 import com.example.bookstore.ui.screen.BookScreen.Screen.AddBookScreen
 import com.example.bookstore.ui.theme.BookStoreTheme

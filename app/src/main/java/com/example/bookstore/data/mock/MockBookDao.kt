@@ -1,4 +1,4 @@
-package com.example.bookstore.data.dao
+package com.example.bookstore.data.mock
 
 import com.example.bookstore.data.ipackage.IBookDao
 import com.example.bookstore.data.model.Book
