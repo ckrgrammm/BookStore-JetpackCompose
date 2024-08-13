@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.bookstore.ui.screen.UserScreen.Screen.LoginScreen
+import com.example.bookstore.ui.screen.UserScreen.Screen.LoginContent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -19,25 +19,29 @@ class LoginScreenTest
     @get:Rule
     val composeTestRule = createComposeRule()
 
-//    @get:Rule
-//    val mockitoRule = MockitoJUnit.rule()
-
     private lateinit var navController: NavHostController
 
     @Before
     fun setup()
     {
         navController = TestNavHostController(InstrumentationRegistry.getInstrumentation().targetContext)
-
     }
 
     @Test
-    fun testLoginScreen_uiElementsDisplayed()
+    fun testLoginContent_uiElementsDisplayed()
     {
         composeTestRule.setContent {
-            LoginScreen(
-                    navController = navController,
-                    onLoginSuccess = {}
+            LoginContent(
+                    userName = "",
+                    onUserNameChange = {},
+                    password = "",
+                    onPasswordChange = {},
+                    onLoginClick = {},
+                    onRegisterClick = {},
+                    showDialog = false,
+                    dialogTitle = "",
+                    dialogMessage = "",
+                    onDismissDialog = {}
             )
         }
 
@@ -48,16 +52,22 @@ class LoginScreenTest
     }
 
     @Test
-    fun testLoginScreen_loginSuccessful()
+    fun testLoginContent_loginSuccessful()
     {
         var loginSuccessCalled = false
 
         composeTestRule.setContent {
-            LoginScreen(
-                    navController = navController,
-                    onLoginSuccess = {
-                        loginSuccessCalled = true
-                    }
+            LoginContent(
+                    userName = "",
+                    onUserNameChange = {},
+                    password = "",
+                    onPasswordChange = {},
+                    onLoginClick = { loginSuccessCalled = true },
+                    onRegisterClick = {},
+                    showDialog = false,
+                    dialogTitle = "",
+                    dialogMessage = "",
+                    onDismissDialog = {}
             )
         }
 
@@ -67,12 +77,20 @@ class LoginScreenTest
     }
 
     @Test
-    fun testLoginScreen_loginFailureShowsErrorDialog()
+    fun testLoginContent_loginFailureShowsErrorDialog()
     {
         composeTestRule.setContent {
-            LoginScreen(
-                    navController = navController,
-                    onLoginSuccess = {}
+            LoginContent(
+                    userName = "",
+                    onUserNameChange = {},
+                    password = "",
+                    onPasswordChange = {},
+                    onLoginClick = {},
+                    onRegisterClick = {},
+                    showDialog = true,
+                    dialogTitle = "Error",
+                    dialogMessage = "Invalid Credentials",
+                    onDismissDialog = {}
             )
         }
 

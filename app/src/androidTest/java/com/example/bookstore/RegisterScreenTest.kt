@@ -2,42 +2,43 @@ package com.example.bookstore
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.bookstore.data.mock.MockUserDaoClass
-import com.example.bookstore.data.ipackage.IUserDao
-import com.example.bookstore.ui.screen.UserScreen.Screen.RegisterScreen
+import com.example.bookstore.ui.screen.UserScreen.Screen.RegisterContent
 import com.example.bookstore.ui.theme.BookStoreTheme
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class RegisterScreenTest {
+class RegisterScreenTest
+{
 
     @get:Rule(order = 1)
     val composeTestRule = createComposeRule()
 
-    private lateinit var userDao: IUserDao
-
-    @Before
-    fun setUp() {
-        userDao = MockUserDaoClass()
-
+    @Test
+    fun testRegisterContent_initialState()
+    {
         composeTestRule.setContent {
-            val navController = rememberNavController()
-
             BookStoreTheme {
-                RegisterScreen(
-                        navController = navController,
+                RegisterContent(
+                        userName = "",
+                        onUserNameChange = {},
+                        password = "",
+                        onPasswordChange = {},
+                        rePassword = "",
+                        onRePasswordChange = {},
+                        onRegisterClick = {},
+                        errorMessage = null,
+                        showDialog = false,
+                        dialogTitle = "",
+                        dialogMessage = "",
+                        onDismissDialog = {},
+                        onConfirmDialog = {}
                 )
             }
         }
-    }
 
-    @Test
-    fun testRegisterScreen_initialState() {
         composeTestRule.onNodeWithText("Book Store Register").assertIsDisplayed()
         composeTestRule.onNodeWithText("Username").assertIsDisplayed()
         composeTestRule.onNodeWithText("Password").assertIsDisplayed()
@@ -45,32 +46,80 @@ class RegisterScreenTest {
     }
 
     @Test
-    fun testRegisterScreen_passwordsDoNotMatch() {
-        composeTestRule.onNodeWithText("Username").performTextInput("NewUser")
-        composeTestRule.onNodeWithText("Password").performTextInput("password")
-        composeTestRule.onNodeWithText("Re-enter Password").performTextInput("differentpassword")
+    fun testRegisterContent_passwordsDoNotMatch()
+    {
+        composeTestRule.setContent {
+            BookStoreTheme {
+                RegisterContent(
+                        userName = "NewUser",
+                        onUserNameChange = {},
+                        password = "password",
+                        onPasswordChange = {},
+                        rePassword = "differentpassword",
+                        onRePasswordChange = {},
+                        onRegisterClick = {},
+                        errorMessage = null,
+                        showDialog = true,
+                        dialogTitle = "Error",
+                        dialogMessage = "Passwords do not match.",
+                        onDismissDialog = {},
+                        onConfirmDialog = {}
+                )
+            }
+        }
 
-        composeTestRule.onNodeWithText("Register").performClick()
         composeTestRule.onNodeWithText("Passwords do not match.").assertIsDisplayed()
     }
 
     @Test
-    fun testRegisterScreen_usernameAlreadyTaken() {
-        composeTestRule.onNodeWithText("Username").performTextInput("Testing")
-        composeTestRule.onNodeWithText("Password").performTextInput("password")
-        composeTestRule.onNodeWithText("Re-enter Password").performTextInput("password")
+    fun testRegisterContent_usernameAlreadyTaken()
+    {
+        composeTestRule.setContent {
+            BookStoreTheme {
+                RegisterContent(
+                        userName = "Testing",
+                        onUserNameChange = {},
+                        password = "password",
+                        onPasswordChange = {},
+                        rePassword = "password",
+                        onRePasswordChange = {},
+                        onRegisterClick = {},
+                        errorMessage = null,
+                        showDialog = true,
+                        dialogTitle = "Error",
+                        dialogMessage = "Username is already taken.",
+                        onDismissDialog = {},
+                        onConfirmDialog = {}
+                )
+            }
+        }
 
-        composeTestRule.onNodeWithText("Register").performClick()
         composeTestRule.onNodeWithText("Username is already taken.").assertIsDisplayed()
     }
 
     @Test
-    fun testRegisterScreen_successfulRegistration() {
-        composeTestRule.onNodeWithText("Username").performTextInput("NewUser")
-        composeTestRule.onNodeWithText("Password").performTextInput("password")
-        composeTestRule.onNodeWithText("Re-enter Password").performTextInput("password")
+    fun testRegisterContent_successfulRegistration()
+    {
+        composeTestRule.setContent {
+            BookStoreTheme {
+                RegisterContent(
+                        userName = "NewUser",
+                        onUserNameChange = {},
+                        password = "password",
+                        onPasswordChange = {},
+                        rePassword = "password",
+                        onRePasswordChange = {},
+                        onRegisterClick = {},
+                        errorMessage = null,
+                        showDialog = true,
+                        dialogTitle = "Success",
+                        dialogMessage = "Registered Successfully!",
+                        onDismissDialog = {},
+                        onConfirmDialog = {}
+                )
+            }
+        }
 
-        composeTestRule.onNodeWithText("Register").performClick()
         composeTestRule.onNodeWithText("Success").assertIsDisplayed()
     }
 }
