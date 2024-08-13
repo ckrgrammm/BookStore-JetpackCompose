@@ -153,12 +153,6 @@ fun UserScreenContent(
             topBar = {
                 TopAppBar(
                         title = { Text("User Profile") },
-                        actions = {
-                            IconButton(onClick = { onLogoutClick() }) {
-                                Icon(painterResource(id = R.drawable.ic_logout), contentDescription = "Logout",
-                                        modifier = Modifier.size(75.dp) )
-                            }
-                        }
                 )
             }
     ) {
@@ -234,6 +228,12 @@ fun UserScreenContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            Button(
+                    onClick = onLogoutClick,
+                    modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Logout")
+            }
         }
 
         if (showDialog) {

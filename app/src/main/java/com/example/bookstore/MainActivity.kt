@@ -5,8 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -53,51 +57,57 @@ class MainActivity : ComponentActivity()
                             BottomNavigationBar(navController = navController)
                         }
                     }
-            ) {
-                NavHost(navController = navController, startDestination = if (currentUser == null) "login" else "home") {
-                    composable("login") {
-                        LoginScreen(navController) { user ->
-                            UserSession.login(user)
-                            navController.navigate("home") {
-                                popUpTo("login") { inclusive = true }
+            ) { padding ->
+                Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                ) {
+                    NavHost(navController = navController, startDestination = if (currentUser == null) "login" else "home") {
+                        composable("login") {
+                            LoginScreen(navController) { user ->
+                                UserSession.login(user)
+                                navController.navigate("home") {
+                                    popUpTo("login") { inclusive = true }
+                                }
                             }
                         }
-                    }
-                    composable("register") {
-                        RegisterScreen(navController)
-                    }
-                    composable("bookDetail/{bookId}") { backStackEntry ->
-                        val bookId = backStackEntry.arguments?.getString("bookId")?.toIntOrNull()
-                        bookId?.let { BookDetailScreen(navController, bookDao, it) }
-                    }
-                    composable("editBook/{bookId}") { backStackEntry ->
-                        val bookId = backStackEntry.arguments?.getString("bookId")?.toIntOrNull()
-                        bookId?.let { EditBookScreen(navController, bookDao, it) }
-                    }
-
-                    composable("home") {
-                        val currentUser = UserSession.getCurrentUser()
-                        Log.d("MainActivity", "Navigating to HomeScreen with user: $currentUser")
-                        currentUser?.let {
-                            HomeScreen(navController, bookDao, it)
+                        composable("register") {
+                            RegisterScreen(navController)
                         }
-                    }
-
-                    composable("addBook") {
-                        val currentUser = UserSession.getCurrentUser()
-                        Log.d("MainActivity", "Navigating to AddBookScreen with user: $currentUser")
-                        currentUser?.let {
-                            AddBookScreen(navController, bookDao, it)
+                        composable("bookDetail/{bookId}") { backStackEntry ->
+                            val bookId = backStackEntry.arguments?.getString("bookId")?.toIntOrNull()
+                            bookId?.let { BookDetailScreen(navController, bookDao, it) }
                         }
-                    }
-
-                    composable("user") {
-                        val currentUser = UserSession.getCurrentUser()
-                        Log.d("MainActivity", "Navigating to UserScreen with user: $currentUser")
-                        currentUser?.let {
-                            UserScreen(navController, userDao, it)
+                        composable("editBook/{bookId}") { backStackEntry ->
+                            val bookId = backStackEntry.arguments?.getString("bookId")?.toIntOrNull()
+                            bookId?.let { EditBookScreen(navController, bookDao, it) }
                         }
-                    }
+
+                        composable("home") {
+                            val currentUser = UserSession.getCurrentUser()
+                            Log.d("MainActivity", "Navigating to HomeScreen with user: $currentUser")
+                            currentUser?.let {
+                                HomeScreen(navController, bookDao, it)
+                            }
+                        }
+
+                        composable("addBook") {
+                            val currentUser = UserSession.getCurrentUser()
+                            Log.d("MainActivity", "Navigating to AddBookScreen with user: $currentUser")
+                            currentUser?.let {
+                                AddBookScreen(navController, bookDao, it)
+                            }
+                        }
+
+                        composable("user") {
+                            val currentUser = UserSession.getCurrentUser()
+                            Log.d("MainActivity", "Navigating to UserScreen with user: $currentUser")
+                            currentUser?.let {
+                                UserScreen(navController, userDao, it)
+                            }
+                        }
+                }
 
                 }
             }
